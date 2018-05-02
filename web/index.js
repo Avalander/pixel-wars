@@ -11,5 +11,8 @@ const pusher = new Pusher(PUSHER_KEY, {
 	cluster: 'eu',
 	encrypted: true,
 })
+
 pusher.subscribe('ponies')
 	.bind('pony-data', app.ports.messages.send)
+
+app.ports.trigger.subscribe(text => console.log(text))
