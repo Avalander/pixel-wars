@@ -1,5 +1,9 @@
 const path = require('path')
+
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+require('dotenv').config()
 
 module.exports = ({ base_dir, folders }) => ({
 	entry: {
@@ -21,13 +25,21 @@ module.exports = ({ base_dir, folders }) => ({
 							browsers: [ 'last 2 versions' ],
 						}
 					}]],
-					/*
-					plugins: [
-						['transform-object-rest-spread', { useBuiltIns: true }]
-					],
-					*/
 				},
 			}
+		}, {
+			test: /\.elm$/,
+			exclude: [
+				'elm-stuff',
+				'node_modules',
+			],
+			use: [{
+				loader: 'elm-webpack-loader',
+				options: {
+					verbose: true,
+					warn: true,
+				}
+			}]
 		}]
 	},
 	plugins: [
@@ -36,13 +48,9 @@ module.exports = ({ base_dir, folders }) => ({
 			filename: 'index.html',
 			chunks: [ 'main' ],
 		}),
-		/*
-		new HtmlWebpackPlugin({
-			template: path.join(folders.src, 'login.html'),
-			filename: 'login.html',
-			chunks: [ 'login' ],
-		}),
-		*/
+		new webpack.DefinePlugin({
+			PUSHER_KEY: JSON.stringify(process.env.PUSHER_KEY),
+		})
 	],
 	resolve: {
 		modules: [
