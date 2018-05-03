@@ -4,9 +4,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
 
-import Msgs exposing (Msg(..))
+import RemoteData exposing (WebData)
+
+import Messages exposing (Msg(..))
+import Model exposing(Cell)
 import Pusher exposing (..)
-import Board exposing (boardView)
+import Board exposing (boardView, fetchBoard)
 
 
 main : Program Never Model Msg
@@ -26,6 +29,7 @@ type alias Model =
     { name : String
     , username : Maybe String
     , route : Route
+    , board : WebData (List Cell)
     }
 
 
@@ -45,6 +49,8 @@ update msg model =
             | name = (toString x) ++ ":" ++ (toString y)
             },
             Cmd.none)
+        OnFetchBoard response ->
+            ({ model | board = response }, Cmd.none)
 
 view : Model -> Html Msg
 view model =
@@ -68,7 +74,7 @@ signInView model =
 gameView : Model -> Html Msg
 gameView model =
     div []
-        [ boardView
+        [ boardView model.board
         , text model.name
         ]
 
@@ -83,5 +89,6 @@ init = (
     { name = "Random"
     , username = Nothing
     , route = SignIn
+    , board = RemoteData.Loading
     },
-    Cmd.none)
+    fetchBoard)

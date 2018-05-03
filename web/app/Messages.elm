@@ -1,6 +1,9 @@
-module Msgs exposing (..)
+module Messages exposing (..)
 
+import Model exposing (Cell)
 import Pusher exposing (Pony)
+
+import RemoteData exposing (WebData)
 
 type Msg
     = OnPusherMessage Pony
@@ -8,3 +11,5 @@ type Msg
     | InputUsername String
     | Submit
     | OnCellClick Int Int
+    | OnFetchBoard (WebData (List Cell))
+

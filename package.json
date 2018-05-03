@@ -2,9 +2,10 @@
   "name": "pixel-wars",
   "version": "1.0.0",
   "description": "",
+  "repository": "https://github.com/Avalander/pixel-wars",
   "main": "index.js",
   "scripts": {
-    "api": "NODE_PATH=api:shared node api/index.js",
+    "api": "NODE_PATH=api nodemon --watch api api/index.js",
     "web": "webpack-dev-server --mode=development --env=development",
     "start": "nf start",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,6 +22,7 @@
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "foreman": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
+    "nodemon": "^1.17.3",
     "pusher-js": "^4.2.2",
     "sass-loader": "^7.0.1",
     "style-loader": "^0.21.0",

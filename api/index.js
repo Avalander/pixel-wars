@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 
 const makeDatabase = require('database')
 const initPusher = require('init-pusher')
+const makeGameApi = require('game')
 
 require('dotenv').config()
 
@@ -18,6 +19,7 @@ const {
 	PUSHER_SECRET,
 	PUSHER_CLUSTER,
 } = process.env
+const { Router } = express
 
 const pusher = initPusher({ PUSHER_APP_ID, PUSHER_KEY, PUSHER_SECRET, PUSHER_CLUSTER })
 
@@ -30,6 +32,9 @@ database()
 	.then(db => {
 		const static_root = path.join(__dirname, '..', 'static')
 		app.use(express.static(static_root, { extensions: [ 'html' ]}))
+
+		app.use('/api', makeGameApi({ Router }))
+
 		app.listen(PORT, () => `Server started on port ${PORT}.`)
 
 		//setTimeout(() => pusher.trigger('ponies', 'pony-data', { name: 'Twilight Sparkle' }), 10000)

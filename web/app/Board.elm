@@ -1,34 +1,58 @@
 module Board exposing (..)
 
+import Http
+import Json.Decode as Decode
+import Json.Decode.Pipeline exposing (decode, required, optional)
+
+import RemoteData exposing (WebData)
+
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 
-import Msgs exposing (Msg(..))
+import Messages exposing (Msg(..))
+import Model exposing (Cell)
 
 
-board : List (Int, Int)
-board = List.concat
-    [ List.map2 (,) (List.range 0 9) (List.repeat 10 0)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 1)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 2)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 3)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 4)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 5)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 6)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 7)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 8)
-    , List.map2 (,) (List.range 0 9) (List.repeat 10 9)
-    ]
+fetchBoard : Cmd Msg
+fetchBoard =
+    Http.get "/api/board" boardDecoder
+        |> RemoteData.sendRequest
+        |> Cmd.map OnFetchBoard
 
-boardView : Svg Msg
-boardView =
-    svg [ viewBox "0 0 500 500", width "500px" ]
-        (List.map cellView board)
+boardDecoder : Decode.Decoder (List Cell)
+boardDecoder = Decode.list cellDecoder
 
-cellView : (Int, Int) -> Svg Msg
-cellView (x1, y1) =
+cellDecoder : Decode.Decoder Cell
+cellDecoder =
+    decode Cell
+        |> required "x" Decode.int
+        |> required "y" Decode.int
+        |> optional "owner" (Decode.nullable Decode.string) Nothing
+
+boardView : WebData (List Cell) -> Svg Msg
+boardView response =
+    case response of
+        RemoteData.NotAsked ->
+            text ""
+        RemoteData.Loading ->
+            text "Loading..."
+        RemoteData.Success board ->
+            svg [ viewBox "0 0 500 500", width "500px" ]
+                (List.map cellView board)
+        RemoteData.Failure error ->
+            text (toString error)
+
+-- boardView : Svg Msg
+-- boardView =
+--     svg [ viewBox "0 0 500 500", width "500px" ]
+--         (List.map cellView board)
+
+cellView : Cell -> Svg Msg
+cellView cell =
     let
+        x1 = cell.x
+        y1 = cell.y
         message = OnCellClick x1 y1
     in
         rect [ x (toString (x1 * 50))
