@@ -1,0 +1,29 @@
+@import "scss/variables";
+
+.btn {
+	font-size: 16px;
+	border: none;
+	background: none;
+	color: inherit;
+	padding: 10px 20px;
+	box-shadow: $box-shadow-sm;
+
+	&:hover {
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	&:active {
+		transform: translateY(2px);
+		outline: none;
+	}
+
+	&.primary {
+		background: $color-primary;
+		color: #fff;
+
+		&:active {
+			box-shadow: 0 0 4px rgba(6, 17, 6, 0.4);
+		}
+	}
+}

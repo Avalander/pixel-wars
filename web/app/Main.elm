@@ -73,12 +73,14 @@ view model =
 
 signInView : Model -> Html Msg
 signInView model =
-    div []
+    div [ class "panel column w600" ]
         [ h1 [] [ text "Welcome to Pixel Wars!" ]
-        , Html.form [ onSubmit Submit]
+        , Html.form [ class "column form-group", onSubmit Submit]
             [ label [] [ text "Enter a nickname" ]
             , input [ onInput InputUsername ] []
-            , button [ type_ "submit" ] [ text "Go!" ]
+            , div [ class "center m10" ]
+                [ button [ class "btn primary", type_ "submit" ] [ text "Go!" ]
+                ]
             ]
         ]
 

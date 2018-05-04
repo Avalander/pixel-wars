@@ -1,0 +1,24 @@
+@import "scss/variables";
+
+input {
+	background: lighten($color-background, 15%);
+	border: none;
+	border-bottom: 1px solid $color-background;
+	padding: 10px;
+	color: inherit;
+	caret-color: $color-text;
+	font-size: 16px;
+	box-shadow: $box-shadow-sm;
+
+	&:focus {
+		outline: none;
+		color: $color-primary;
+		caret-color: $color-primary;
+		border-bottom: 1px solid $color-primary;
+	}
+}
+
+label {
+	font-weight: bold;
+	text-transform: uppercase;
+}

@@ -1,3 +1,5 @@
+import 'index.scss'
+
 import Elm from 'app/Main.elm'
 
 import Pusher from 'pusher-js'

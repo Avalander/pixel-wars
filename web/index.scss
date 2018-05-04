@@ -1,0 +1,8 @@
+@import "scss/variables";
+@import "scss/main";
+
+body {
+	background: $color-background;
+	color: $color-text;
+	font-family: 'Gothic A1', sans-serif; 
+}

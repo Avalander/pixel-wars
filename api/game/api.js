@@ -10,7 +10,7 @@ module.exports = ({ Router, makeGameState, registerUser, auth }) => {
 				next,
 				({ username, count }) =>
 					res.cookie('user', JSON.stringify({ username, count }), { httpOnly: true })
-						.json({ username: `${username}$${count}`, board })
+						.json({ username: `${username} #${count}`, board })
 			)
 	)
 
