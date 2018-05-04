@@ -19,7 +19,7 @@ cellDecoder =
     decode Cell
         |> required "x" Decode.int
         |> required "y" Decode.int
-        |> optional "owner" (Decode.nullable Decode.string) Nothing
+        |> optional "color" (Decode.nullable Decode.string) Nothing
 
 boardView : (List Cell) -> Svg Msg
 boardView board =    
@@ -32,12 +32,17 @@ cellView cell =
         x1 = cell.x
         y1 = cell.y
         message = OnCellClick x1 y1
+        color = case cell.color of
+            Just color ->
+                color
+            Nothing ->
+                "#eee"
     in
         rect [ x (toString (x1 * 50))
             , y (toString (y1 * 50))
             , width "50px"
             , height "50px"
             , stroke "#111"
-            , fill "#eee"
+            , fill color
             , onClick message
             ] []

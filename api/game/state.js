@@ -10,6 +10,7 @@ const createBoard = (width, height) => {
 		for (let x = 0; x < width; x++) {
 			result.push({
 				x, y,
+				color: '#444444'
 			})
 		}
 	}
