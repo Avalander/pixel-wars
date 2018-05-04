@@ -2,6 +2,7 @@ const path = require('path')
 
 const express = require('express')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 
 const makeDatabase = require('database')
 const initPusher = require('init-pusher')
@@ -25,6 +26,7 @@ const pusher = initPusher({ PUSHER_APP_ID, PUSHER_KEY, PUSHER_SECRET, PUSHER_CLU
 
 const app = express()
 app.disable('x-powered-by')
+app.use(cookieParser())
 app.use(bodyParser.json())
 
 const database = makeDatabase({ DB_URL, DB_NAME })
@@ -33,7 +35,7 @@ database()
 		const static_root = path.join(__dirname, '..', 'static')
 		app.use(express.static(static_root, { extensions: [ 'html' ]}))
 
-		app.use('/api', makeGameApi({ Router }))
+		app.use('/api', makeGameApi({ Router, db }))
 
 		app.listen(PORT, () => `Server started on port ${PORT}.`)
 

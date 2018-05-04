@@ -7,9 +7,9 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing(Cell)
+import Model exposing(Cell, GameResponse)
 import Pusher exposing (..)
-import Board exposing (boardView, fetchBoard)
+import Game exposing (fetchGame, gameView)
 
 
 main : Program Never Model Msg
@@ -30,6 +30,7 @@ type alias Model =
     , username : Maybe String
     , route : Route
     , board : WebData (List Cell)
+    , game : WebData GameResponse
     }
 
 
@@ -43,14 +44,24 @@ update msg model =
         InputUsername text ->
             ({ model | username = Just text }, Cmd.none)
         Submit ->
-            ({ model | route = Game }, Cmd.none)
+            case model.username of
+                Nothing ->
+                    (model, Cmd.none)
+                Just username ->
+                    (model, fetchGame username)
         OnCellClick x y ->
             ({ model
             | name = (toString x) ++ ":" ++ (toString y)
             },
             Cmd.none)
-        OnFetchBoard response ->
-            ({ model | board = response }, Cmd.none)
+        OnFetchGame response ->
+            (
+                { model
+                | game = response
+                , route = Game
+                },
+                Cmd.none
+            )
 
 view : Model -> Html Msg
 view model =
@@ -73,10 +84,7 @@ signInView model =
 
 gameView : Model -> Html Msg
 gameView model =
-    div []
-        [ boardView model.board
-        , text model.name
-        ]
+    Game.gameView model.game
 
 
 subscriptions : Model -> Sub Msg
@@ -90,5 +98,6 @@ init = (
     , username = Nothing
     , route = SignIn
     , board = RemoteData.Loading
+    , game = RemoteData.Loading
     },
-    fetchBoard)
+    Cmd.none)

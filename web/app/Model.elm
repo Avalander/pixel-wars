@@ -6,3 +6,8 @@ type alias Cell =
     , y : Int
     , owner : Maybe String
     }
+
+type alias GameResponse =
+    { username : String
+    , board : List Cell
+    }
