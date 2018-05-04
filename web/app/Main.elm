@@ -67,7 +67,7 @@ view : Model -> Html Msg
 view model =
     case model.route of
         Game ->
-            gameView model
+            gameView model.game
         SignIn ->
             signInView model
 
@@ -81,10 +81,6 @@ signInView model =
             , button [ type_ "submit" ] [ text "Go!" ]
             ]
         ]
-
-gameView : Model -> Html Msg
-gameView model =
-    Game.gameView model.game
 
 
 subscriptions : Model -> Sub Msg
