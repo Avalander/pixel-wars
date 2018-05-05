@@ -11,7 +11,7 @@ const app = Elm.Main.embed(mount_node)
 
 let pusher
 
-app.ports.connect.subscribe((() => {
+app.ports.connect.subscribe(() => {
 	pusher = new Pusher(PUSHER_KEY, {
 		cluster: 'eu',
 		encrypted: true,
@@ -20,4 +20,4 @@ app.ports.connect.subscribe((() => {
 		.bind('pony-data', app.ports.messages.send)
 	
 	console.log('Connected!')
-}))
+})
