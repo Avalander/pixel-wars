@@ -6,4 +6,4 @@ type alias Pony =
 
 port messages : (Pony -> msg) -> Sub msg
 
-port trigger : String -> Cmd msg
+port connect : String -> Cmd msg

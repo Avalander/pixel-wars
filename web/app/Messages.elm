@@ -7,7 +7,6 @@ import RemoteData exposing (WebData)
 
 type Msg
     = OnPusherMessage Pony
-    | TriggerPusherMessage String
     | InputUsername String
     | Submit
     | OnCellClick Int Int

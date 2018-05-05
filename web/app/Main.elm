@@ -39,8 +39,6 @@ update msg model =
     case msg of
         OnPusherMessage pony ->
             ({ model | name = pony.name }, Cmd.none)
-        TriggerPusherMessage message ->
-            (model, Pusher.trigger message)
         InputUsername text ->
             ({ model | username = Just text }, Cmd.none)
         Submit ->
@@ -60,7 +58,7 @@ update msg model =
                 | game = response
                 , route = Game
                 },
-                Cmd.none
+                Pusher.connect "connect"
             )
 
 view : Model -> Html Msg
