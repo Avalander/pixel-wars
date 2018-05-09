@@ -1,4 +1,4 @@
-module.exports = ({ Router, makeGameState, registerUser, auth }) => {
+module.exports = ({ Router, pusher, makeGameState, registerUser, auth }) => {
 	const api = Router()
 	const board = makeGameState()
 
@@ -19,22 +19,9 @@ module.exports = ({ Router, makeGameState, registerUser, auth }) => {
 		const boardCell = board.find(({ x, y }) => x == cell.x && y == cell.y)
 		boardCell.color = '#' + user.color
 		res.json({ board })
-	})
 
-	/*
-	const state$ = xs.create({
-		start: listener => {
-			api.post('/claim', auth, (req, res) => {
-				listener.next({ type: 'claim', user: req.user, cell: req.body.cell })
-				res.json({ ok: true })
-			})
-		},
-		stop: () => {},
+		pusher.trigger('game-updates', 'update-cell', boardCell)
 	})
-	.fold((prev, { user, cell }) => {
-
-	}, board)
-	*/
 
 	return api
 }

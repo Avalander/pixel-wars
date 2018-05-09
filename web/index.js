@@ -16,8 +16,8 @@ app.ports.connect.subscribe(() => {
 		cluster: 'eu',
 		encrypted: true,
 	})
-	pusher.subscribe('ponies')
-		.bind('pony-data', app.ports.messages.send)
+	pusher.subscribe('game-updates')
+		.bind('update-cell', app.ports.updateCell.send)
 	
 	console.log('Connected!')
 })

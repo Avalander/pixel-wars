@@ -68,20 +68,8 @@ encodeClaimCellRequest cell =
 
 -- VIEW
 
-gameView : (WebData GameResponse) -> Html Msg
-gameView response =
-    case response of
-        RemoteData.Loading ->
-            loadingView
-        RemoteData.NotAsked ->
-            notAskedView
-        RemoteData.Success game ->
-            successView game
-        RemoteData.Failure error ->
-            errorView error
-
-successView : GameResponse -> Html Msg
-successView { user, board } =
+gameView : List Cell -> User -> Html Msg
+gameView board user =
     div []
         [ renderHeader user
         , boardView board
