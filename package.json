@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "api": "NODE_PATH=api nodemon --watch api api/index.js",
+    "api2": "NODE_PATH=api node api/index.js",
     "web": "webpack-dev-server --mode=development --env=development",
     "start": "nf start",
     "test": "echo \"Error: no test specified\" && exit 1"

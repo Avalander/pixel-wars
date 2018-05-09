@@ -1,6 +1,6 @@
-module Game exposing (fetchGame, gameView)
+module Game exposing (fetchGame, claimCell, gameView)
 
-import Html exposing (Html, text, div)
+import Html exposing (Html, text, div, span)
 import Html.Attributes exposing (class, style)
 
 import Http
@@ -11,11 +11,11 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing (Cell, GameResponse, User)
+import Model exposing (Cell, GameResponse, User, ClaimCellResponse)
 import Board exposing (boardDecoder, boardView)
 
 
--- REQUEST
+-- FETCH GAME
 
 fetchGame : String -> Cmd Msg
 fetchGame username =
@@ -42,6 +42,29 @@ decodeUser =
         |> required "username" Decode.string
         |> required "count" Decode.int
         |> required "color" Decode.string
+
+
+-- CLAIM CELL
+
+claimCell : Cell -> Cmd Msg
+claimCell cell =
+    Http.post "/api/claim" (encodeClaimCellRequest cell) claimCellResponseDecoder
+        |> RemoteData.sendRequest
+        |> Cmd.map OnClaimCell
+
+claimCellResponseDecoder : Decode.Decoder ClaimCellResponse
+claimCellResponseDecoder =
+    decode ClaimCellResponse
+        |> required "board" boardDecoder
+
+encodeClaimCellRequest : Cell -> Http.Body
+encodeClaimCellRequest cell =
+    cell
+        |> (\{ x, y } -> Encode.object
+            [ ("x", Encode.int x)
+            , ("y", Encode.int y)
+            ])
+        |> Http.jsonBody
 
 -- VIEW
 
@@ -70,8 +93,12 @@ userToString { username, count } =
 
 renderHeader : User -> Html Msg
 renderHeader user =
-    div [ class "header", style [("backgroundColor", "#" ++ user.color)] ]
-        [ text (userToString user) ]
+    div [ class "header" ]
+        [ span [ class "color-box"
+               , style [("backgroundColor", "#" ++ user.color), ("color", "#" ++ user.color)] ]
+               [ text "TS" ]
+        , text (userToString user)
+        ]
 
 loadingView : Html Msg
 loadingView =

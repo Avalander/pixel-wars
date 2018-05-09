@@ -18,7 +18,7 @@ module.exports.makeRegisterUser = ({ db }) => username =>
 	.map(([ user, _ ]) => user)
 
 module.exports.makeFindUser = ({ db }) => ({ username, count }) =>
-	findUser(db, username)
+	findUser(db, username, count)
 		.chain(user => user
 			? Future.of(user)
 			: Future.reject('User not found.')
@@ -29,10 +29,10 @@ module.exports.makeFindUser = ({ db }) => ({ username, count }) =>
 		)
 
 
-const findUser = (db, username) =>
+const findUser = (db, username, count) =>
 	Future.node(done =>
 		db.collection('users')
-			.findOne({ username }, done)
+			.findOne({ username, count }, done)
 	)
 
 const userOrCreate = username => user =>

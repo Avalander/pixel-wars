@@ -9,7 +9,7 @@ import RemoteData exposing (WebData)
 import Messages exposing (Msg(..))
 import Model exposing(Cell, GameResponse)
 import Pusher exposing (..)
-import Game exposing (fetchGame, gameView)
+import Game exposing (fetchGame, gameView, claimCell)
 
 
 main : Program Never Model Msg
@@ -29,7 +29,7 @@ type alias Model =
     { name : String
     , username : Maybe String
     , route : Route
-    , board : WebData (List Cell)
+    , board : List Cell
     , game : WebData GameResponse
     }
 
@@ -47,11 +47,11 @@ update msg model =
                     (model, Cmd.none)
                 Just username ->
                     (model, fetchGame username)
-        OnCellClick x y ->
+        OnCellClick cell ->
             ({ model
-            | name = (toString x) ++ ":" ++ (toString y)
+            | name = (toString cell.x) ++ ":" ++ (toString cell.y)
             },
-            Cmd.none)
+            claimCell cell)
         OnFetchGame response ->
             (
                 { model
@@ -60,6 +60,19 @@ update msg model =
                 },
                 Pusher.connect "connect"
             )
+        OnClaimCell response ->
+            case response of
+                RemoteData.NotAsked ->
+                    (model, Cmd.none)
+                RemoteData.Loading ->
+                    (model, Cmd.none)
+                RemoteData.Success response ->
+                    ({ model
+                    | board = response.board
+                    }, Cmd.none)
+                RemoteData.Failure error ->
+                    (model, Cmd.none)
+
 
 view : Model -> Html Msg
 view model =
@@ -93,7 +106,7 @@ init = (
     { name = "Random"
     , username = Nothing
     , route = SignIn
-    , board = RemoteData.Loading
+    , board = []
     , game = RemoteData.Loading
     },
     Cmd.none)

@@ -2,17 +2,24 @@ module.exports = ({ Router, makeGameState, registerUser, auth }) => {
 	const api = Router()
 	const board = makeGameState()
 
-	api.get('/board', (req, res) => res.json(board))
-
 	api.post('/register', (req, res, next) =>
 		registerUser(req.body.username)
 			.fork(
 				next,
 				({ username, count, color }) =>
-					res.cookie('user', JSON.stringify({ username, count }), { httpOnly: true })
+					res.cookie('user', JSON.stringify({ username, count, color }), { httpOnly: true })
 						.json({ user: { username, count, color }, board })
 			)
 	)
+
+	api.post('/claim', auth, (req, res) => {
+		const user = req.user
+		const cell = req.body
+
+		const boardCell = board.find(({ x, y }) => x == cell.x && y == cell.y)
+		boardCell.color = '#' + user.color
+		res.json({ board })
+	})
 
 	/*
 	const state$ = xs.create({

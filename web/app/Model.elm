@@ -17,3 +17,7 @@ type alias GameResponse =
     { user : User
     , board : List Cell
     }
+
+type alias ClaimCellResponse =
+    { board : List Cell
+    }

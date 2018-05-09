@@ -31,7 +31,7 @@ cellView cell =
     let
         x1 = cell.x
         y1 = cell.y
-        message = OnCellClick x1 y1
+        message = OnCellClick cell
         color = case cell.color of
             Just color ->
                 color
