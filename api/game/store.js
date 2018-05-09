@@ -7,8 +7,6 @@ module.exports.makeRegisterUser = ({ db }) => username =>
 			.count({ username }, done)
 	)
 	.map(count => ({ username, count, color: randomColor() }))
-	//.map(userOrCreate(username))
-	//.map(incrementCount)
 	.chain(user =>
 		Future.both(
 			Future.of(user),
@@ -34,15 +32,6 @@ const findUser = (db, username, count) =>
 		db.collection('users')
 			.findOne({ username, count }, done)
 	)
-
-const userOrCreate = username => user =>
-	(user != null
-		? user
-		: ({ username, count: 0 })
-	)
-
-const incrementCount = user =>
-	Object.assign({}, user, { count: user.count + 1 })
 
 const saveUser = (db, user) =>
 	Future.node(done =>
