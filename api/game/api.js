@@ -1,18 +1,27 @@
-module.exports = ({ Router, makeGameState, registerUser, auth }) => {
+module.exports = ({ Router, pusher, makeGameState, registerUser, auth }) => {
 	const api = Router()
 	const board = makeGameState()
-
-	api.get('/board', (req, res) => res.json(board))
 
 	api.post('/register', (req, res, next) =>
 		registerUser(req.body.username)
 			.fork(
 				next,
-				({ username, count }) =>
-					res.cookie('user', JSON.stringify({ username, count }), { httpOnly: true })
-						.json({ username: `${username} #${count}`, board })
+				({ username, count, color }) =>
+					res.cookie('user', JSON.stringify({ username, count, color }), { httpOnly: true })
+						.json({ user: { username, count, color }, board })
 			)
 	)
+
+	api.post('/claim', auth, (req, res) => {
+		const user = req.user
+		const cell = req.body
+
+		const boardCell = board.find(({ x, y }) => x == cell.x && y == cell.y)
+		boardCell.color = '#' + user.color
+		res.json({ board })
+
+		pusher.trigger('game-updates', 'update-cell', boardCell)
+	})
 
 	return api
 }

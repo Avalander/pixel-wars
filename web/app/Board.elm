@@ -21,6 +21,15 @@ cellDecoder =
         |> required "y" Decode.int
         |> optional "color" (Decode.nullable Decode.string) Nothing
 
+updateCell : (List Cell) -> Cell -> (List Cell)
+updateCell board cell =
+    let
+        isTargetCell = (\x -> x.x == cell.x && x.y == cell.y)
+        updateTargetCell = (\x -> if (isTargetCell x) then cell else x)
+    in
+        List.map updateTargetCell board
+            
+
 boardView : (List Cell) -> Svg Msg
 boardView board =    
     svg [ viewBox "0 0 500 500", width "500px" ]
@@ -31,7 +40,7 @@ cellView cell =
     let
         x1 = cell.x
         y1 = cell.y
-        message = OnCellClick x1 y1
+        message = OnCellClick cell
         color = case cell.color of
             Just color ->
                 color

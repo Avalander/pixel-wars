@@ -1,14 +1,14 @@
 module Messages exposing (..)
 
-import Model exposing (Cell, GameResponse)
-import Pusher exposing (Pony)
+import Model exposing (Cell, GameResponse, ClaimCellResponse)
 
 import RemoteData exposing (WebData)
 
 type Msg
-    = OnPusherMessage Pony
+    = OnUpdateCell Cell
     | InputUsername String
     | Submit
-    | OnCellClick Int Int
+    | OnCellClick Cell
     | OnFetchGame (WebData GameResponse)
+    | OnClaimCell (WebData ClaimCellResponse)
 

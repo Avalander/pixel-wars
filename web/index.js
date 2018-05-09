@@ -11,13 +11,13 @@ const app = Elm.Main.embed(mount_node)
 
 let pusher
 
-app.ports.connect.subscribe((() => {
+app.ports.connect.subscribe(() => {
 	pusher = new Pusher(PUSHER_KEY, {
 		cluster: 'eu',
 		encrypted: true,
 	})
-	pusher.subscribe('ponies')
-		.bind('pony-data', app.ports.messages.send)
+	pusher.subscribe('game-updates')
+		.bind('update-cell', app.ports.updateCell.send)
 	
 	console.log('Connected!')
-}))
+})

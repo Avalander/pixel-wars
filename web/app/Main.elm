@@ -7,9 +7,10 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing(Cell, GameResponse)
+import Model exposing(Cell, GameResponse, User)
 import Pusher exposing (..)
-import Game exposing (fetchGame, gameView)
+import Game exposing (fetchGame, gameView, claimCell)
+import Board exposing (updateCell)
 
 
 main : Program Never Model Msg
@@ -29,16 +30,14 @@ type alias Model =
     { name : String
     , username : Maybe String
     , route : Route
-    , board : WebData (List Cell)
-    , game : WebData GameResponse
+    , board : List Cell
+    , user : User
     }
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        OnPusherMessage pony ->
-            ({ model | name = pony.name }, Cmd.none)
         InputUsername text ->
             ({ model | username = Just text }, Cmd.none)
         Submit ->
@@ -47,25 +46,54 @@ update msg model =
                     (model, Cmd.none)
                 Just username ->
                     (model, fetchGame username)
-        OnCellClick x y ->
+        OnCellClick cell ->
             ({ model
-            | name = (toString x) ++ ":" ++ (toString y)
+            | name = (toString cell.x) ++ ":" ++ (toString cell.y)
             },
-            Cmd.none)
+            claimCell cell)
         OnFetchGame response ->
+            case response of
+                RemoteData.NotAsked ->
+                    (model, Cmd.none)
+                RemoteData.Loading ->
+                    (model, Cmd.none)
+                RemoteData.Success { board, user } ->
+                    (
+                        { model
+                        | board = board
+                        , user = user
+                        , route = Game
+                        },
+                        Pusher.connect "connect"
+                    )
+                RemoteData.Failure error ->
+                    (model, Cmd.none)
+        OnClaimCell response ->
+            case response of
+                RemoteData.NotAsked ->
+                    (model, Cmd.none)
+                RemoteData.Loading ->
+                    (model, Cmd.none)
+                RemoteData.Success response ->
+                    ({ model
+                    | board = response.board
+                    }, Cmd.none)
+                RemoteData.Failure error ->
+                    (model, Cmd.none)
+        OnUpdateCell cell ->
             (
                 { model
-                | game = response
-                , route = Game
+                | board = (Board.updateCell model.board cell)
                 },
-                Pusher.connect "connect"
+                Cmd.none
             )
+
 
 view : Model -> Html Msg
 view model =
     case model.route of
         Game ->
-            gameView model.game
+            gameView model.board model.user
         SignIn ->
             signInView model
 
@@ -85,7 +113,7 @@ signInView model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Pusher.messages OnPusherMessage
+    Pusher.updateCell OnUpdateCell
 
 
 init : (Model, Cmd Msg)
@@ -93,7 +121,7 @@ init = (
     { name = "Random"
     , username = Nothing
     , route = SignIn
-    , board = RemoteData.Loading
-    , game = RemoteData.Loading
+    , board = []
+    , user = { username = "", count = 0, color = "" }
     },
     Cmd.none)
