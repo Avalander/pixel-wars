@@ -4,10 +4,11 @@ const Future = require('fluture')
 module.exports.makeRegisterUser = ({ db }) => username =>
 	Future.node(done =>
 		db.collection('users')
-			.findOne({ username }, done)
+			.count({ username }, done)
 	)
-	.map(userOrCreate(username))
-	.map(incrementCount)
+	.map(count => ({ username, count, color: randomColor() }))
+	//.map(userOrCreate(username))
+	//.map(incrementCount)
 	.chain(user =>
 		Future.both(
 			Future.of(user),
@@ -46,5 +47,16 @@ const incrementCount = user =>
 const saveUser = (db, user) =>
 	Future.node(done =>
 		db.collection('users')
-			.save(user, null, done)
+			.insertOne(user, null, done)
 	)
+
+const randomColor = () => {
+	const result = []
+	for (let i=0; i<6; i++) {
+		result.push(choose('0123456789abcdef'))
+	}
+	return result.join('')
+}
+
+const choose = options =>
+	options[Math.floor(Math.random() * options.length)]

@@ -8,11 +8,26 @@ module.exports = ({ Router, makeGameState, registerUser, auth }) => {
 		registerUser(req.body.username)
 			.fork(
 				next,
-				({ username, count }) =>
+				({ username, count, color }) =>
 					res.cookie('user', JSON.stringify({ username, count }), { httpOnly: true })
-						.json({ username: `${username} #${count}`, board })
+						.json({ user: { username, count, color }, board })
 			)
 	)
+
+	/*
+	const state$ = xs.create({
+		start: listener => {
+			api.post('/claim', auth, (req, res) => {
+				listener.next({ type: 'claim', user: req.user, cell: req.body.cell })
+				res.json({ ok: true })
+			})
+		},
+		stop: () => {},
+	})
+	.fold((prev, { user, cell }) => {
+
+	}, board)
+	*/
 
 	return api
 }

@@ -1,7 +1,7 @@
 module Game exposing (fetchGame, gameView)
 
 import Html exposing (Html, text, div)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 
 import Http
 import Json.Encode as Encode
@@ -11,7 +11,7 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing (Cell, GameResponse)
+import Model exposing (Cell, GameResponse, User)
 import Board exposing (boardDecoder, boardView)
 
 
@@ -26,7 +26,7 @@ fetchGame username =
 gameResponseDecoder : Decode.Decoder GameResponse
 gameResponseDecoder =
     decode GameResponse
-        |> required "username" Decode.string
+        |> required "user" decodeUser
         |> required "board" boardDecoder
 
 encodeGameRequest : String -> Http.Body
@@ -36,6 +36,12 @@ encodeGameRequest username =
         |> (\x -> Encode.object [("username", x)])
         |> Http.jsonBody
 
+decodeUser : Decode.Decoder User
+decodeUser =
+    decode User
+        |> required "username" Decode.string
+        |> required "count" Decode.int
+        |> required "color" Decode.string
 
 -- VIEW
 
@@ -52,16 +58,20 @@ gameView response =
             errorView error
 
 successView : GameResponse -> Html Msg
-successView { username, board } =
+successView { user, board } =
     div []
-        [ renderHeader username
+        [ renderHeader user
         , boardView board
         ]
 
-renderHeader : String -> Html Msg
-renderHeader username =
-    div [ class "header" ]
-        [ text username ]
+userToString : User -> String
+userToString { username, count } =
+    username ++ " #" ++ (toString count)
+
+renderHeader : User -> Html Msg
+renderHeader user =
+    div [ class "header", style [("backgroundColor", "#" ++ user.color)] ]
+        [ text (userToString user) ]
 
 loadingView : Html Msg
 loadingView =

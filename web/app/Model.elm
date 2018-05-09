@@ -7,7 +7,13 @@ type alias Cell =
     , color : Maybe String
     }
 
-type alias GameResponse =
+type alias User =
     { username : String
+    , count : Int
+    , color : String
+    }
+
+type alias GameResponse =
+    { user : User
     , board : List Cell
     }
