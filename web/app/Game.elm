@@ -11,8 +11,9 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing (Cell, GameResponse, User, ClaimCellResponse)
+import Model exposing (Cell, GameResponse, User, ClaimCellResponse, Board)
 import Board exposing (boardDecoder, boardView)
+import User exposing (decodeUser)
 
 
 -- FETCH GAME
@@ -35,13 +36,6 @@ encodeGameRequest username =
         |> Encode.string
         |> (\x -> Encode.object [("username", x)])
         |> Http.jsonBody
-
-decodeUser : Decode.Decoder User
-decodeUser =
-    decode User
-        |> required "username" Decode.string
-        |> required "count" Decode.int
-        |> required "color" Decode.string
 
 
 -- CLAIM CELL
@@ -68,7 +62,7 @@ encodeClaimCellRequest cell =
 
 -- VIEW
 
-gameView : List Cell -> User -> Html Msg
+gameView : Board -> User -> Html Msg
 gameView board user =
     div []
         [ renderHeader user

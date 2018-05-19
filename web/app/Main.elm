@@ -7,7 +7,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing(Cell, GameResponse, User)
+import Model exposing(Cell, GameResponse, User, Board)
 import Pusher exposing (..)
 import Game exposing (fetchGame, gameView, claimCell)
 import Board exposing (updateCell)
@@ -30,7 +30,7 @@ type alias Model =
     { name : String
     , username : Maybe String
     , route : Route
-    , board : List Cell
+    , board : Model.Board
     , user : User
     }
 
@@ -121,7 +121,7 @@ init = (
     { name = "Random"
     , username = Nothing
     , route = SignIn
-    , board = []
+    , board = { width = 50, height = 50, cells = [] }
     , user = { username = "", count = 0, color = "" }
     },
     Cmd.none)

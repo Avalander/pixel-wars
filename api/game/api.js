@@ -16,8 +16,8 @@ module.exports = ({ Router, pusher, makeGameState, registerUser, auth }) => {
 		const user = req.user
 		const cell = req.body
 
-		const boardCell = board.find(({ x, y }) => x == cell.x && y == cell.y)
-		boardCell.color = '#' + user.color
+		const boardCell = board.cells.find(({ x, y }) => x == cell.x && y == cell.y)
+		boardCell.owner = user
 		res.json({ board })
 
 		pusher.trigger('game-updates', 'update-cell', boardCell)

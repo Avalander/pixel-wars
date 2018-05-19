@@ -8,49 +8,62 @@ import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 
 import Messages exposing (Msg(..))
-import Model exposing (Cell)
+import Model exposing (Cell, Board)
+import User exposing (decodeUser)
 
 
-boardDecoder : Decode.Decoder (List Cell)
-boardDecoder = Decode.list cellDecoder
+boardDecoder : Decode.Decoder Board
+boardDecoder = 
+    decode Board
+        |> required "width" Decode.int
+        |> required "height" Decode.int
+        |> required "cells" (Decode.list cellDecoder)
 
 cellDecoder : Decode.Decoder Cell
 cellDecoder =
     decode Cell
         |> required "x" Decode.int
         |> required "y" Decode.int
-        |> optional "color" (Decode.nullable Decode.string) Nothing
+        |> optional "owner" (Decode.nullable decodeUser) Nothing
 
-updateCell : (List Cell) -> Cell -> (List Cell)
+updateCell : Board -> Cell -> Board
 updateCell board cell =
     let
         isTargetCell = (\x -> x.x == cell.x && x.y == cell.y)
         updateTargetCell = (\x -> if (isTargetCell x) then cell else x)
+        cells = List.map updateTargetCell board.cells
     in
-        List.map updateTargetCell board
+        { board
+        | cells = cells
+        }
             
 
-boardView : (List Cell) -> Svg Msg
-boardView board =    
-    svg [ viewBox "0 0 500 500", width "500px" ]
-        (List.map cellView board)
+boardView : Board -> Svg Msg
+boardView board =
+    let
+        cell_width = 500 // board.width
+        cell_height = 500 // board.height
+        renderCell = cellView cell_width cell_height
+    in
+        svg [ viewBox "0 0 500 500", width "500px" ]
+            (List.map renderCell board.cells)
 
-cellView : Cell -> Svg Msg
-cellView cell =
+cellView : Int -> Int -> Cell -> Svg Msg
+cellView cell_width cell_height cell =
     let
         x1 = cell.x
         y1 = cell.y
         message = OnCellClick cell
-        color = case cell.color of
-            Just color ->
-                color
+        color = case cell.owner of
+            Just user ->
+                "#" ++ user.color
             Nothing ->
                 "#eee"
     in
-        rect [ x (toString (x1 * 50))
-            , y (toString (y1 * 50))
-            , width "50px"
-            , height "50px"
+        rect [ x (toString (x1 * cell_width))
+            , y (toString (y1 * cell_height))
+            , width ((toString cell_width) ++ "px")
+            , height ((toString cell_height) ++ "px")
             , stroke "#111"
             , fill color
             , onClick message

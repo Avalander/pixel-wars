@@ -1,7 +1,11 @@
 module.exports = () => {
-	const board = createBoard(10, 10)
+	const board = createBoard(25, 25)
 
-	return board
+	return {
+		width: 25,
+		height: 25,
+		cells: board,
+	}
 }
 
 const createBoard = (width, height) => {
@@ -10,7 +14,6 @@ const createBoard = (width, height) => {
 		for (let x = 0; x < width; x++) {
 			result.push({
 				x, y,
-				color: '#444444'
 			})
 		}
 	}
