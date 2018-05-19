@@ -16,8 +16,9 @@ app.ports.connect.subscribe(() => {
 		cluster: 'eu',
 		encrypted: true,
 	})
-	pusher.subscribe('game-updates')
-		.bind('update-cell', app.ports.updateCell.send)
+	const channel = pusher.subscribe('game-updates')
+	channel.bind('update-cell', app.ports.updateCell.send)
+	channel.bind('update-leaderboard', app.ports.updateLeaderboard.send)
 	
 	console.log('Connected!')
 })

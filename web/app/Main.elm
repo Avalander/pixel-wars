@@ -7,7 +7,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing(Cell, GameResponse, User, Board)
+import Model exposing(Cell, GameResponse, User, Board, Leaderboard)
 import Pusher exposing (..)
 import Game exposing (fetchGame, gameView, claimCell)
 import Board exposing (updateCell)
@@ -31,6 +31,7 @@ type alias Model =
     , username : Maybe String
     , route : Route
     , board : Model.Board
+    , leaderboard : Leaderboard
     , user : User
     }
 
@@ -87,13 +88,20 @@ update msg model =
                 },
                 Cmd.none
             )
+        OnUpdateLeaderboard leaderboard ->
+            (
+                { model
+                | leaderboard = leaderboard
+                },
+                Cmd.none
+            )
 
 
 view : Model -> Html Msg
 view model =
     case model.route of
         Game ->
-            gameView model.board model.user
+            gameView model.board model.user model.leaderboard
         SignIn ->
             signInView model
 
@@ -113,7 +121,10 @@ signInView model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Pusher.updateCell OnUpdateCell
+    Sub.batch
+        [ Pusher.updateCell OnUpdateCell
+        , Pusher.updateLeaderboard OnUpdateLeaderboard
+        ]
 
 
 init : (Model, Cmd Msg)
@@ -122,6 +133,7 @@ init = (
     , username = Nothing
     , route = SignIn
     , board = { width = 50, height = 50, cells = [] }
+    , leaderboard = []
     , user = { username = "", count = 0, color = "" }
     },
     Cmd.none)
