@@ -1,4 +1,4 @@
-module.exports = ({ Router, pusher, makeGameState, registerUser, auth }) => {
+module.exports = ({ Router, pusher, makeGameState, registerUser, increaseCellCount, auth }) => {
 	const api = Router()
 	const board = makeGameState()
 
@@ -18,9 +18,14 @@ module.exports = ({ Router, pusher, makeGameState, registerUser, auth }) => {
 
 		const boardCell = board.cells.find(({ x, y }) => x == cell.x && y == cell.y)
 		boardCell.owner = user
-		res.json({ board })
-
-		pusher.trigger('game-updates', 'update-cell', boardCell)
+		increaseCellCount(user)
+			.fork(
+				err => res.status(500).send(err),
+				user => {
+					res.json({ board })
+					pusher.trigger('game-updates', 'update-cell', boardCell)
+				}
+			)
 	})
 
 	return api

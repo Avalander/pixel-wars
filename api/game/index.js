@@ -3,6 +3,7 @@ const makeGameState = require('./state')
 const {
 	makeFindUser,
 	makeRegisterUser,
+	makeIncreaseCellCount,
 } = require('./store')
 const makeAuth = require('./auth')
 
@@ -14,6 +15,7 @@ module.exports = ({ Router, db, pusher }) => {
 		pusher,
 		makeGameState,
 		registerUser: makeRegisterUser({ db }),
+		increaseCellCount: makeIncreaseCellCount({ db }),
 		auth: makeAuth({ findUser }),
 	})
 }
