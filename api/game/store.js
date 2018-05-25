@@ -26,6 +26,22 @@ module.exports.makeFindUser = ({ db }) => ({ username, count }) =>
 			: Future.reject('User not found.')
 		)
 
+module.exports.makeIncreaseCellCount = ({ db }) => ({ username, count }) =>
+		findUser(db, username, count)
+			.chain(user => user
+				? Future.of(user)
+				: Future.reject('User not found.')
+			)
+			.map(user => Object.assign({}, user, {
+				claimed_cells: (user.claimed_cells || 0) + 1
+			}))
+			.chain(user =>
+				Future.both(
+					Future.of(user),
+					saveUser(db, user)
+				)
+			)
+			.map(([ user, _ ]) => user)
 
 const findUser = (db, username, count) =>
 	Future.node(done =>
@@ -36,7 +52,7 @@ const findUser = (db, username, count) =>
 const saveUser = (db, user) =>
 	Future.node(done =>
 		db.collection('users')
-			.insertOne(user, null, done)
+			.save(user, null, done)
 	)
 
 const randomColor = () => {

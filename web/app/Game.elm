@@ -11,9 +11,10 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 import RemoteData exposing (WebData)
 
 import Messages exposing (Msg(..))
-import Model exposing (Cell, GameResponse, User, ClaimCellResponse, Board)
+import Model exposing (Cell, GameResponse, User, ClaimCellResponse, Board, Leaderboard)
 import Board exposing (boardDecoder, boardView)
-import User exposing (decodeUser)
+import User exposing (decodeUser, userToString)
+import Leaderboard
 
 
 -- FETCH GAME
@@ -62,16 +63,15 @@ encodeClaimCellRequest cell =
 
 -- VIEW
 
-gameView : Board -> User -> Html Msg
-gameView board user =
-    div []
-        [ renderHeader user
-        , boardView board
+gameView : Board -> User -> Leaderboard -> Html Msg
+gameView board user leaderboard =
+    div [ class "game-view" ]
+        [ div []
+              [ renderHeader user
+              , boardView board 
+              ]
+        , Leaderboard.view leaderboard
         ]
-
-userToString : User -> String
-userToString { username, count } =
-    username ++ " #" ++ (toString count)
 
 renderHeader : User -> Html Msg
 renderHeader user =

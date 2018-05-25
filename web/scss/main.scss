@@ -2,6 +2,7 @@
 @import "scss/panel";
 @import "scss/button";
 @import "scss/form";
+@import "scss/leaderboard";
 
 @import url('https://fonts.googleapis.com/css?family=Gothic+A1');
 
@@ -15,7 +16,12 @@ h1 {
 }
 
 .color-box {
-	height: 10px;
-	width: 10px;
+	min-height: 20px;
+	min-width: 20px;
 	margin-right: 5px;
+}
+
+.game-view {
+	display: flex;
+	flex-direction: row;
 }

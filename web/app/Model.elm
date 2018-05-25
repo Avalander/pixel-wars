@@ -27,3 +27,11 @@ type alias GameResponse =
 type alias ClaimCellResponse =
     { board : Board
     }
+
+type alias LeaderboardEntry =
+    { amount : Int
+    , user : User
+    }
+
+type alias Leaderboard =
+    List LeaderboardEntry

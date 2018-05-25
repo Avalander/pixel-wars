@@ -1,0 +1,20 @@
+.leaderboard {
+	margin-left: 50px;
+
+	h1 {
+		margin-top: 0;
+		margin-bottom: 10px;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		margin-bottom: 5px;
+	}
+
+	.column {
+		width: 200px;
+		display: flex;
+		flex-direction: row;
+	}
+}
